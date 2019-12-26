@@ -12,6 +12,7 @@ from collections import OrderedDict
 from datetime import datetime
 from multiprocessing import Process
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
+from telegram.error import (TelegramError, Unauthorized, BadRequest, TimedOut, ChatMigrated, NetworkError)
 
 file_path = ''
 
@@ -183,7 +184,6 @@ def telegram_perky_bot():
     dispatcher.add_handler(echo_handler)
     updater.start_polling()
     updater.idle()
-
 
 if __name__ == '__main__':
     p1 = Process(target=update_rubbish_dates)
