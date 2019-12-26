@@ -23,7 +23,6 @@ date1_type2 = []
 date2_type1 = []
 date2_type2 = []
 
-
 def get_dates():
     global now
     global date1
@@ -96,54 +95,45 @@ def update_rubbish_dates():
             print(colored('Your collection dates are as follows:', 'green'))
             print(colored(date1, 'yellow'))
             if date1_type2 == []:
-                unordered_dict = (
-                ("Title", "Your next collection dates:"), ("Date1", date1), ("Date1_type1", date1_type1),
-                ("Date2", date2), ("Date2_type1", date2_type1),
-                ("Date2_type2", date2_type2))
+                unordered_dict = (("Title", "Your next collection dates:"), ("Date1", date1), ("Date1_type1", date1_type1),
+                                  ("Date2", date2), ("Date2_type1", date2_type1),
+                                  ("Date2_type2", date2_type2))
                 print(colored(date1_type1, 'yellow'))
             else:
-                unordered_dict = (
-                ("Title", "Your next collection dates:"), ("Date1", date1), ("Date1_type1", date1_type1),
-                ("Date1_type2", date1_type2),
-                ("Date2", date2), ("Date2_type1", date2_type1))
+                unordered_dict = (("Title", "Your next collection dates:"), ("Date1", date1), ("Date1_type1", date1_type1),("Date1_type2", date1_type2),
+                                  ("Date2", date2), ("Date2_type1", date2_type1))
                 print(colored(date1_type1, 'yellow'))
                 print(colored(date1_type2, 'yellow'))
             print(colored(date2, 'yellow'))
             if date2_type2 == []:
-                unordered_dict = (
-                ("Title", "Your next collection dates:"), ("Date1", date1), ("Date1_type1", date1_type1),
-                ("Date1_type2", date1_type2),
-                ("Date2", date2), ("Date2_type1", date2_type1))
+                unordered_dict = (("Title", "Your next collection dates:"), ("Date1", date1), ("Date1_type1", date1_type1),("Date1_type2", date1_type2),
+                                  ("Date2", date2), ("Date2_type1", date2_type1))
                 print(colored(date2_type1, 'yellow'))
             else:
-                unordered_dict = (
-                ("Title", "Your next collection dates:"), ("Date1", date1), ("Date1_type1", date1_type1),
-                ("Date2", date2),
-                ("Date2_type1", date2_type1), ("Date2_type2", date2_type2))
+                unordered_dict = (("Title", "Your next collection dates:"), ("Date1", date1), ("Date1_type1", date1_type1),("Date2", date2),
+                                  ("Date2_type1", date2_type1),("Date2_type2", date2_type2))
                 print(colored(date2_type1, 'yellow'))
-                print(colored(date2_type2, 'yellow'))
+                print(colored(date2_type2,'yellow'))
 
             # convert stored values into JSON file and format (so I don't have to fuck around with the HASS template sensors)
             ordered_dict = OrderedDict(unordered_dict)
             print('\n')
-            print(colored('Printing results in JSON format', 'red'))
+            print(colored('Printing results in JSON format','red'))
             print('\n')
-            print(json.dumps(ordered_dict, indent=4))
+            print(json.dumps(ordered_dict,indent=4))
             print('\n')
             print('Generated at ' + str(now))
 
             text_file = open(os.path.join(file_path, 'result.json'), "w")
-            text_file.write(json.dumps(ordered_dict, indent=4))
+            text_file.write(json.dumps(ordered_dict,indent=4))
             text_file.close()
 
-            time.sleep(3600)
+            time.sleep(60)
         except KeyboardInterrupt:
-            raise ('exit')
-
+            raise('exit')
 
 def start(update, context):
     context.bot.send_message(chat_id=update.effective_chat.id, text="I'm a perky. Please bare with me ^_^ ")
-
 
 def echo(update, context):
     global date1
@@ -160,22 +150,21 @@ def echo(update, context):
     if condition_text.find('rubbish') > -1:
         if str(now) < date2:
             if date1_type2 == []:
-                update.message.reply_text(format(date1) + ' ' + format(date1_type1))
+                context.bot.send_message(chat_id=update.effective_chat.id, text=format(date1) + ' ' + format(date1_type1))
             elif date1_type2 != []:
-                update.message.reply_text(format(date1) + ' ' + format(date1_type1) + ' ' + format(date1_type2))
+                context.bot.send_message(chat_id=update.effective_chat.id, text=format(date1) + ' ' + format(date1_type1) + ' ' + format(date1_type2))
 
     if condition_text.find('rubbish') > -1:
         if str(now) >= date2:
             if date2_type2 == []:
-                update.message.reply_text(format(date2) + ' ' + format(date2_type1))
+                context.bot.send_message(chat_id=update.effective_chat.id, text=format(date2) + ' ' + format(date2_type1))
             elif date2_type2 != []:
-                update.message.reply_text(format(date2) + ' ' + format(date2_type1) + ' ' + format(date2_type2))
-
+                context.bot.send_message(chat_id=update.effective_chat.id, text=format(date2) + ' ' + format(date2_type1) + ' ' + format(date2_type2))
 
 def telegram_perky_bot():
     logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                         level=logging.INFO)
-    updater = Updater(token=creds.telegram_token, use_context=True)
+    updater = Updater(token='786591601:AAFZ9f5wsnL58o5OgwiOcOiXjQe7sPKY-p4', use_context=True)
     dispatcher = updater.dispatcher
     start_handler = CommandHandler('start', start)
     dispatcher.add_handler(start_handler)
@@ -184,8 +173,7 @@ def telegram_perky_bot():
     updater.start_polling()
     updater.idle()
 
-
-if __name__ == '__main__':
+if __name__=='__main__':
     p1 = Process(target=update_rubbish_dates)
     p1.start()
     p2 = Process(target=telegram_perky_bot)
