@@ -160,38 +160,6 @@ def update_rubbish_dates():
         except KeyboardInterrupt:
             raise ('exit')
 
-#def start(update, context):
-#    context.bot.send_message(chat_id=update.effective_chat.id, text="I'm a perky. Please bare with me ^_^ ")
-
-#def echo(update, context):
-#    global date1
-#    global date1_type1
-#    global date1_type2
-#    global date2
-#    global date2_type1
-#    global date2_type2
-#    global now
-#
-#    get_dates()
-#    condition_text = str(update.message.text)
-#
-#
-#    if condition_text.find('rubbish') > -1:
-#        if str(now) < date2:
-#            if date1_type2 == []:
-#                update.message.reply_text(format(date1) + ' ' + format(date1_type1))
-#                updater.send_chat_action(chat_id=chat_id, action=telegram.ChatAction.TYPING)
-#            elif date1_type2 != []:
-#                update.message.reply_text(format(date1) + ' ' + format(date1_type1) + ' ' + format(date1_type2))
-#
-#    if condition_text.find('rubbish') > -1:
-#        if str(now) >= date2:
-#            if date2_type2 == []:
-#                update.message.reply_text(format(date2) + ' ' + format(date2_type1))
-#            elif date2_type2 != []:
-#                update.message.reply_text(format(date2) + ' ' + format(date2_type1) + ' ' + format(date2_type2))
-
-
 # Telegram bot functions
 def start(update, context):
     """Send a message when the command /start is issued."""
