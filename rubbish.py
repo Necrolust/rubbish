@@ -15,7 +15,6 @@ from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 from telegram.error import (TelegramError, Unauthorized, BadRequest, TimedOut, ChatMigrated, NetworkError)
 
 file_path = ''
-
 date1 = []
 date2 = []
 now = []
@@ -24,6 +23,11 @@ date1_type2 = []
 date2_type1 = []
 date2_type2 = []
 
+# Enable logging
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+                    level=logging.INFO)
+
+logger = logging.getLogger(__name__)
 
 def get_dates():
     global now
@@ -87,7 +91,6 @@ def get_dates():
         date1_type1 = date1_type[:date1_type.find('Recycle')]
         date1_type2 = date1_type[date1_type.find('Recycle'):]
 
-
 def update_rubbish_dates():
     while True:
         try:
@@ -98,29 +101,45 @@ def update_rubbish_dates():
             print(colored(date1, 'yellow'))
             if date1_type2 == []:
                 unordered_dict = (
-                ("Title", "Your next collection dates:"), ("Date1", date1), ("Date1_type1", date1_type1),
-                ("Date2", date2), ("Date2_type1", date2_type1),
-                ("Date2_type2", date2_type2))
+                ("Title", "Your next collection dates:"),
+                ("Date1", date1),
+                ("Date1_type1", date1_type1),
+                ("Date2", date2),
+                ("Date2_type1", date2_type1),
+                ("Date2_type2", date2_type2)
+                )
                 print(colored(date1_type1, 'yellow'))
             else:
                 unordered_dict = (
-                ("Title", "Your next collection dates:"), ("Date1", date1), ("Date1_type1", date1_type1),
+                ("Title", "Your next collection dates:"),
+                ("Date1", date1),
+                ("Date1_type1", date1_type1),
                 ("Date1_type2", date1_type2),
-                ("Date2", date2), ("Date2_type1", date2_type1))
+                ("Date2", date2),
+                ("Date2_type1", date2_type1)
+                )
                 print(colored(date1_type1, 'yellow'))
                 print(colored(date1_type2, 'yellow'))
             print(colored(date2, 'yellow'))
             if date2_type2 == []:
                 unordered_dict = (
-                ("Title", "Your next collection dates:"), ("Date1", date1), ("Date1_type1", date1_type1),
+                ("Title", "Your next collection dates:"),
+                ("Date1", date1),
+                ("Date1_type1", date1_type1),
                 ("Date1_type2", date1_type2),
-                ("Date2", date2), ("Date2_type1", date2_type1))
+                ("Date2", date2),
+                ("Date2_type1", date2_type1)
+                )
                 print(colored(date2_type1, 'yellow'))
             else:
                 unordered_dict = (
-                ("Title", "Your next collection dates:"), ("Date1", date1), ("Date1_type1", date1_type1),
+                ("Title", "Your next collection dates:"),
+                ("Date1", date1),
+                ("Date1_type1", date1_type1),
                 ("Date2", date2),
-                ("Date2_type1", date2_type1), ("Date2_type2", date2_type2))
+                ("Date2_type1", date2_type1),
+                ("Date2_type2", date2_type2)
+                )
                 print(colored(date2_type1, 'yellow'))
                 print(colored(date2_type2, 'yellow'))
 
@@ -141,12 +160,48 @@ def update_rubbish_dates():
         except KeyboardInterrupt:
             raise ('exit')
 
+#def start(update, context):
+#    context.bot.send_message(chat_id=update.effective_chat.id, text="I'm a perky. Please bare with me ^_^ ")
 
+#def echo(update, context):
+#    global date1
+#    global date1_type1
+#    global date1_type2
+#    global date2
+#    global date2_type1
+#    global date2_type2
+#    global now
+#
+#    get_dates()
+#    condition_text = str(update.message.text)
+#
+#
+#    if condition_text.find('rubbish') > -1:
+#        if str(now) < date2:
+#            if date1_type2 == []:
+#                update.message.reply_text(format(date1) + ' ' + format(date1_type1))
+#                updater.send_chat_action(chat_id=chat_id, action=telegram.ChatAction.TYPING)
+#            elif date1_type2 != []:
+#                update.message.reply_text(format(date1) + ' ' + format(date1_type1) + ' ' + format(date1_type2))
+#
+#    if condition_text.find('rubbish') > -1:
+#        if str(now) >= date2:
+#            if date2_type2 == []:
+#                update.message.reply_text(format(date2) + ' ' + format(date2_type1))
+#            elif date2_type2 != []:
+#                update.message.reply_text(format(date2) + ' ' + format(date2_type1) + ' ' + format(date2_type2))
+
+
+# Telegram bot functions
 def start(update, context):
-    context.bot.send_message(chat_id=update.effective_chat.id, text="I'm a perky. Please bare with me ^_^ ")
+    """Send a message when the command /start is issued."""
+    update.message.reply_text('Hi!')
 
+def help(update, context):
+    """Send a message when the command /help is issued."""
+    update.message.reply_text('Help:' + '\n' + 'Use the word "rubbish" in any sentence to get the next collection dates')
 
-def echo(update, context):
+def reply_with_rubbish_date(update, context):
     global date1
     global date1_type1
     global date1_type2
@@ -157,32 +212,49 @@ def echo(update, context):
 
     get_dates()
     condition_text = str(update.message.text)
-
     if condition_text.find('rubbish') > -1:
         if str(now) < date2:
             if date1_type2 == []:
-                update.message.reply_text(format(date1) + ' ' + format(date1_type1))
+                update.message.reply_text('Next collection date: ' + format(date1) + '\n' + 'Next collection type: ' + format(date1_type1))
             elif date1_type2 != []:
-                update.message.reply_text(format(date1) + ' ' + format(date1_type1) + ' ' + format(date1_type2))
+                update.message.reply_text('Next collection date: ' + format(date1) + '\n' + 'Next collection type: ' + format(date1_type1) + ' ' + format(date1_type2))
 
     if condition_text.find('rubbish') > -1:
         if str(now) >= date2:
             if date2_type2 == []:
-                update.message.reply_text(format(date2) + ' ' + format(date2_type1))
+                update.message.reply_text('Next collection date: ' + format(date2) + '\n' + 'Next collection type: ' + format(date2_type1))
             elif date2_type2 != []:
-                update.message.reply_text(format(date2) + ' ' + format(date2_type1) + ' ' + format(date2_type2))
+                update.message.reply_text('Next collection date: ' + format(date2) + '\n' + 'Next collection type: ' + format(date2_type1) + ' ' + format(date2_type2))
 
+def error(update, context):
+    """Log Errors caused by Updates."""
+    logger.warning('Update "%s" caused error "%s"', update, context.error)
 
 def telegram_perky_bot():
-    logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-                        level=logging.INFO)
-    updater = Updater(token=creds.telegram_token, use_context=True)
-    dispatcher = updater.dispatcher
-    start_handler = CommandHandler('start', start)
-    dispatcher.add_handler(start_handler)
-    echo_handler = MessageHandler(Filters.text, echo)
-    dispatcher.add_handler(echo_handler)
+    # Create the Updater and pass it your bot's token.
+    # Make sure to set use_context=True to use the new context based callbacks
+    # Post version 12 this will no longer be necessary
+    updater = Updater(creds.telegram_token, use_context=True)
+
+    # Get the dispatcher to register handlers
+    dp = updater.dispatcher
+
+    # on different commands - answer in Telegram
+    dp.add_handler(CommandHandler("start", start))
+    dp.add_handler(CommandHandler("help", help))
+
+    # on noncommand i.e message - echo the message on Telegram
+    dp.add_handler(MessageHandler(Filters.text, reply_with_rubbish_date))
+
+    # log all errors
+    dp.add_error_handler(error)
+
+    # Start the Bot
     updater.start_polling()
+
+    # Run the bot until you press Ctrl-C or the process receives SIGINT,
+    # SIGTERM or SIGABRT. This should be used most of the time, since
+    # start_polling() is non-blocking and will stop the bot gracefully.
     updater.idle()
 
 if __name__ == '__main__':
