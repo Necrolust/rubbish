@@ -15,37 +15,27 @@ from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 from telegram.error import (TelegramError, Unauthorized, BadRequest, TimedOut, ChatMigrated, NetworkError)
 
 file_path = ''
-date1 = []
-date2 = []
-now = []
-date1_type1 = []
-date1_type2 = []
-date2_type1 = []
-date2_type2 = []
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO)
 
 logger = logging.getLogger(__name__)
 
-def get_dates():
-    global now
-    global date1
-    global date2
-    global date1_type1
-    global date1_type2
-    global date2_type1
-    global date2_type2
-
-    now = datetime.now()
+def write_webpage_to_file():
     page = requests.get(creds.url, "rubbish.html")
     soup = BeautifulSoup(page.text, "html.parser")
     get_webpage_as_text = soup.get_text()
-
     text_file = open(os.path.join(file_path, 'webpage_stripped_to_text.txt'), "wb")
     text_file.write(get_webpage_as_text.encode('utf-8'))
     text_file.close()
 
+def get_dates():
+    date1 = []
+    date2 = []
+    date1_type1 = []
+    date1_type2 = []
+    date2_type1 = []
+    date2_type2 = []
     # find only the relevant lines (household collection - not commercial collection)
     with open(os.path.join(file_path, 'webpage_stripped_to_text.txt'), 'r') as f:
         for line in f:
@@ -66,7 +56,6 @@ def get_dates():
     date2_length = len(date2_unparsed)
 
     # separate out the date from the collection type
-    global date1
     date1 = date1_unparsed[:date1_unparsed.find('Rubbish')] + ' ' + str(datetime.now().year)
     # TODO: Change the below to use datetime once we actually hit the year 2020. Uncomment the line following the below.
     date2 = date2_unparsed[:date2_unparsed.find('Rubbish')] + ' 2020'
@@ -89,12 +78,14 @@ def get_dates():
     elif len(date1_type.split()) > 1:
         date1_type1 = date1_type[:date1_type.find('Recycle')]
         date1_type2 = date1_type[date1_type.find('Recycle'):]
+    return date1, date1_type1, date1_type2, date2, date2_type1, date2_type2
 
 def update_rubbish_dates():
     while True:
         try:
-            get_dates()
-
+            write_webpage_to_file()
+            now = datetime.now()
+            date1, date1_type1, date1_type2, date2, date2_type1, date2_type2 = get_dates()
             # print nicely formatted output
             print(colored('Your collection dates are as follows:', 'green'))
             print(colored(date1, 'yellow'))
@@ -157,7 +148,7 @@ def update_rubbish_dates():
 
             time.sleep(3600)
         except KeyboardInterrupt:
-            raise ('exit')
+            raise
 
 # Telegram bot functions
 def start(update, context):
@@ -169,15 +160,7 @@ def help(update, context):
     update.message.reply_text('Help:' + '\n' + 'Use the word "rubbish" in any sentence to get the next collection dates')
 
 def reply_with_rubbish_date(update, context):
-    global date1
-    global date1_type1
-    global date1_type2
-    global date2
-    global date2_type1
-    global date2_type2
-    global now
-
-    get_dates()
+    date1, date1_type1, date1_type2, date2, date2_type1, date2_type2 = get_dates()
     condition_text = str(update.message.text)
     if condition_text.find('rubbish') > -1:
         if str(now) < date2:
@@ -228,4 +211,4 @@ if __name__ == '__main__':
     p1 = Process(target=update_rubbish_dates)
     p1.start()
     p2 = Process(target=telegram_perky_bot)
-#    p2.start()
+    p2.start()
